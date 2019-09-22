@@ -18,6 +18,9 @@ func main() {
 
 	// Build the YAMLHandler using the mapHandler as the fallback
 	yaml := getYAML()
+	// mapHandler is the fall back for yaml
+	// so request for /urlshort-godoc will go to
+	// YAMLHandler -> fallback to mapHandler and served
 	yamlHandler, err := urlshortner.YAMLHandler([]byte(yaml), mapHandler)
 	if err != nil {
 		panic(err)

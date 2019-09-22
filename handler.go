@@ -1,6 +1,7 @@
 package urlshortner
 
 import (
+	"gopkg.in/yaml.v2"
 	"net/http"
 )
 
@@ -42,6 +43,23 @@ func MapHandler(pathToUrls map[string]string, fallback http.Handler) http.Handle
 	See MapHandler to create a similar http.HandlerFunc via
 	a mapping YAML data.
 */
-func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	return nil, nil
+func YAMLHandler(yamlBytes []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	// parse yaml -> convert to map -> return map handler
+	var pathUrls []pathUrl
+	err := yaml.Unmarshal(yamlBytes, &pathUrls)
+	if err != nil {
+		return nil, err
+	}
+
+	pathsToUrls := make(map[string]string)
+	for _, pu := range pathUrls {
+		pathsToUrls[pu.Path] = pu.URL
+	}
+
+	return MapHandler(pathsToUrls, fallback), nil
+}
+
+type pathUrl struct {
+	Path string `yaml:"path"`
+	URL string `yaml:"url"`
 }
